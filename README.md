@@ -24,7 +24,7 @@ To get started, ensure you have PostgreSQL installed:
 
 Once PostgreSQL is set up with these credentials, follow these steps:
 
-1. Run `npm init` to initialize the project.
+1. Run `npm install` to install the dependencies to the local node_modules folder.
 2. Execute `npm run dev` to start the `todo-server` application.
 
 These commands will set up and run the `todo-server` application for further development and testing.

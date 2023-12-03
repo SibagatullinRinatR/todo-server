@@ -1,10 +1,19 @@
 const db = require('../db');
 class TodoController{
     async createTodo(req, res){
-        const {title, content, user_id} = req.body;
-        const newTodo = await db.query(`INSERT INTO todo (title, content, user_id) VALUES ($1, $2, $3) RETURNING *`, [title, content, user_id])
-        res.json(newTodo.rows[0]);
+        console.log(req)
+        // try {
+        //     const {title, content} = req.body;
+        //             console.log(req.body);
+        //     const userId = req.session.user.id;
+        //     const newTodo = await pool.query(`INSERT INTO todo (title, content, user_id) VALUES ($1, $2, $3) RETURNING *`, 
+        //     [title, content, userId])
+        //     res.json(newTodo.rows[0]);
+        // } catch (error) {
+        //     res.status(500).json({ error: error.message });
+        // } 
     }
+    
     async getTodos(req, res){
         const todos = await db.query(`SELECT * FROM todo`)
         res.json(todos.rows)
