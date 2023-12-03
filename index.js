@@ -1,6 +1,5 @@
 const express = require("express");
 const session = require('express-session');
-const flash = require('connect-flash');
 const userRouter = require("./routes/user.router");
 const todoRouter = require("./routes/todo.router");
 const bcrypt = require("bcryptjs");
@@ -13,7 +12,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(corsMiddleware);
-app.use(flash());
 app.use("/api", userRouter);
 app.use("/api/", todoRouter);
 

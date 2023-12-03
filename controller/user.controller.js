@@ -1,29 +1,47 @@
-const db = require('../db');
-class UserController{
-    // async createUser(req, res){
-    //     const {username, surname} = req.body;
-    //     const newPerson = await db.query(`INSERT INTO person (username, surname) VALUES ($1, $2) RETURNING *`, [username, surname])
-    //     res.json(newPerson.rows[0]);
-    // }
-    // async getUsers(req, res){
-    //     const users = await db.query(`SELECT * FROM person`)
-    //     res.json(users.rows)
-    // }
-    // async getOneUser(req, res){
-    //     const id = req.params.id;
-    //     const user = await db.query(`SELECT * FROM person WHERE id = $1`, [id])
-    //     res.json(user.rows[0])
-    // }
-    async updateUser(req, res){
-        const {id, username, surname} = req.body
-        const user = await db.query(`UPDATE person SET username = $1, surname =$2 WHERE id = $3 RETURNING *`, [username, surname, id])
-        res.json(user.rows[0])
+const pool = require("../db");
+const session = require('express-session');
+class UserController {
+  async updateUser(req, res) {
+    try {
+      const { id } = req.params;
+      const { username, email, password } = req.body;
+      const userId = req.session.user.id;
+      if (userId !== req.params.id) {
+        return res
+          .status(403)
+          .json({ error: "Нет доступа к редактированию данного аккаунта" });
+      }
+      const user = await pool.query(
+        `UPDATE person SET username = $1, email =$2, password =$3 WHERE id = $4 RETURNING *`,
+        [username, email, password, userId]
+      );
+      res.json(user.rows[0]);
+    } catch (error) {}
+  }
+
+  async deleteUser(req, res) {
+    try {
+      const userId = req.session.user.id;
+      const deleteId = req.params.id;
+      if (userId !== deleteId) {
+        return res
+          .status(403)
+          .json({ error: "Нет доступа к удалению данного аккаунта" });
+      }
+      const user = await pool.query(`DELETE FROM person WHERE id = $1`, [
+        userId,
+      ]);
+      req.session.destroy((err) => {
+        if (err) {
+          res.status(500).json({ error: "Ошибка удаления сессии" });
+        } else {
+          res.status(200).json({ message: "Аккаунт удален успешно" });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-    async deleteUser(req, res){
-        const id = req.params.id;
-        const user = await db.query(`DELETE FROM person WHERE id = $1`, [id])
-        res.json(user.rows[0])
-    }
+  }
 }
 
-module.exports = new UserController()
+module.exports = new UserController();
